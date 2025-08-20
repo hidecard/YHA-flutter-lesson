@@ -1,39 +1,43 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('YHA Lesson'),
-        backgroundColor: Colors.orange,
-      ),
-      body: const Center(
-        child: Text(
-          'YHA Text Lesson',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.orange,
-          ),
-          textAlign: TextAlign.center,
+      home: Scaffold(
+        appBar: AppBar(title: Text('YHA Lesson')),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  color: Colors.blue,
+                  width: 100,
+                  height: 100,
+                  child: Center(child: Text('Box 1', style: TextStyle(color: Colors.white))),
+                ),
+                Container(
+                  color: Colors.green,
+                  width: 100,
+                  height: 100,
+                  child: Center(child: Text('Box 2', style: TextStyle(color: Colors.white))),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Container(
+              color: Colors.red,
+              width: 100,
+              height: 100,
+              child: Center(child: Text('Box 3', style: TextStyle(color: Colors.white))),
+            ),
+          ],
         ),
       ),
     );
