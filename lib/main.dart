@@ -10,56 +10,66 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      home: const IconButtonExample(),
+      home: Scaffold(
+        appBar: AppBar(title: const Text('YHA Lesson')),
+        body: const GestureDetectorExample(),
+      ),
     );
   }
 }
 
-class IconButtonExample extends StatefulWidget {
-  const IconButtonExample({super.key});
+class GestureDetectorExample extends StatefulWidget {
+  const GestureDetectorExample({super.key});
 
   @override
-  _IconButtonExampleState createState() => _IconButtonExampleState();
+  _GestureDetectorExampleState createState() => _GestureDetectorExampleState();
 }
 
-class _IconButtonExampleState extends State<IconButtonExample> {
-  bool _isDarkMode = false;
+class _GestureDetectorExampleState extends State<GestureDetectorExample> {
+  Color _boxColor = Colors.blue;
+  String _message = 'Tap or Double-Tap the Box';
 
-  void _toggleTheme() {
+  void _handleTap() {
     setState(() {
-      _isDarkMode = !_isDarkMode;
+      _boxColor = Colors.green;
+      _message = 'Single Tap Detected!';
+    });
+  }
+
+  void _handleDoubleTap() {
+    setState(() {
+      _boxColor = Colors.red;
+      _message = 'Double Tap Detected!';
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: _isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      home: Scaffold(
-        appBar: AppBar(title: const Text('YHA Lesson')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                _isDarkMode ? 'Dark Mode' : 'Light Mode',
-                style: const TextStyle(fontSize: 24),
-              ),
-              const SizedBox(height: 20),
-              IconButton(
-                onPressed: _toggleTheme,
-                icon: Icon(
-                  _isDarkMode ? Icons.brightness_7 : Icons.brightness_4,
-                  size: 40,
-                  color: _isDarkMode ? Colors.yellow : Colors.blue,
-                ),
-                tooltip: 'Toggle Theme',
-              ),
-            ],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            _message,
+            style: const TextStyle(fontSize: 24),
           ),
-        ),
+          const SizedBox(height: 20),
+          GestureDetector(
+            onTap: _handleTap,
+            onDoubleTap: _handleDoubleTap,
+            child: Container(
+              width: 150,
+              height: 150,
+              color: _boxColor,
+              child: const Center(
+                child: Text(
+                  'Tap Me',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
