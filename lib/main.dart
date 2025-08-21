@@ -9,14 +9,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text('YHA Lesson')),
-        body: Center(
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
-            color: Colors.orange,
-            child: Text(
-              'Text with Margin',
-              style: TextStyle(color: Colors.white, fontSize: 20),
+        appBar: AppBar(title: const Text('YHA Lesson')),
+        body: Container(
+          width: double.infinity,
+          height: 200,
+          color: Colors.grey[300],
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              width: 100,
+              height: 100,
+              color: Colors.orange,
+              child: const Center(
+                child: Text('Aligned Box', style: TextStyle(color: Colors.white)),
+              ),
             ),
           ),
         ),
