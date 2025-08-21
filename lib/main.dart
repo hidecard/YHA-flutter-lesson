@@ -1,35 +1,61 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('YHA Lesson')),
-        body: Row(
-          children: [
-            Flexible(
-              flex: 1,
-              child: Container(
-                height: 100,
-                color: Colors.blue,
-                child: const Center(child: Text('Flex 1', style: TextStyle(color: Colors.white))),
-              ),
+        appBar: AppBar(title: const Text('ElevatedButton Example')),
+        body: const ElevatedButtonExample(),
+      ),
+    );
+  }
+}
+
+class ElevatedButtonExample extends StatefulWidget {
+  const ElevatedButtonExample({super.key});
+
+  @override
+  _ElevatedButtonExampleState createState() => _ElevatedButtonExampleState();
+}
+
+class _ElevatedButtonExampleState extends State<ElevatedButtonExample> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Counter: $_counter',
+            style: const TextStyle(fontSize: 24),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _incrementCounter,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue, // Button color
+              foregroundColor: Colors.white, // Text/icon color
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              textStyle: const TextStyle(fontSize: 18),
             ),
-            Flexible(
-              flex: 3,
-              child: Container(
-                height: 100,
-                color: Colors.green,
-                child: const Center(child: Text('Flex 3', style: TextStyle(color: Colors.white))),
-              ),
-            ),
-          ],
-        ),
+            child: const Text('Increment'),
+          ),
+        ],
       ),
     );
   }
