@@ -10,52 +10,56 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('ElevatedButton Example')),
-        body: const ElevatedButtonExample(),
-      ),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: const IconButtonExample(),
     );
   }
 }
 
-class ElevatedButtonExample extends StatefulWidget {
-  const ElevatedButtonExample({super.key});
+class IconButtonExample extends StatefulWidget {
+  const IconButtonExample({super.key});
 
   @override
-  _ElevatedButtonExampleState createState() => _ElevatedButtonExampleState();
+  _IconButtonExampleState createState() => _IconButtonExampleState();
 }
 
-class _ElevatedButtonExampleState extends State<ElevatedButtonExample> {
-  int _counter = 0;
+class _IconButtonExampleState extends State<IconButtonExample> {
+  bool _isDarkMode = false;
 
-  void _incrementCounter() {
+  void _toggleTheme() {
     setState(() {
-      _counter++;
+      _isDarkMode = !_isDarkMode;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Counter: $_counter',
-            style: const TextStyle(fontSize: 24),
+    return MaterialApp(
+      theme: _isDarkMode ? ThemeData.dark() : ThemeData.light(),
+      home: Scaffold(
+        appBar: AppBar(title: const Text('YHA Lesson')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _isDarkMode ? 'Dark Mode' : 'Light Mode',
+                style: const TextStyle(fontSize: 24),
+              ),
+              const SizedBox(height: 20),
+              IconButton(
+                onPressed: _toggleTheme,
+                icon: Icon(
+                  _isDarkMode ? Icons.brightness_7 : Icons.brightness_4,
+                  size: 40,
+                  color: _isDarkMode ? Colors.yellow : Colors.blue,
+                ),
+                tooltip: 'Toggle Theme',
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _incrementCounter,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, // Button color
-              foregroundColor: Colors.white, // Text/icon color
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              textStyle: const TextStyle(fontSize: 18),
-            ),
-            child: const Text('Increment'),
-          ),
-        ],
+        ),
       ),
     );
   }
