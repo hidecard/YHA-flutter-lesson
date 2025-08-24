@@ -12,21 +12,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('YHA Lesson')),
-        body: const DropdownButtonExample(),
+        body: const CheckboxExample(),
       ),
     );
   }
 }
 
-class DropdownButtonExample extends StatefulWidget {
-  const DropdownButtonExample({super.key});
+class CheckboxExample extends StatefulWidget {
+  const CheckboxExample({super.key});
 
   @override
-  _DropdownButtonExampleState createState() => _DropdownButtonExampleState();
+  _CheckboxExampleState createState() => _CheckboxExampleState();
 }
 
-class _DropdownButtonExampleState extends State<DropdownButtonExample> {
-  String? _selectedFruit = 'Apple';
+class _CheckboxExampleState extends State<CheckboxExample> {
+  bool _agreed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,27 +34,23 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            margin: const EdgeInsets.all(16.0),
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton<String>(
-              value: _selectedFruit,
-              items: <String>['Apple', 'Banana', 'Orange'].map((String fruit) {
-                return DropdownMenuItem<String>(
-                  value: fruit,
-                  child: Text(fruit),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedFruit = newValue;
-                });
-              },
-              hint: const Text('Pick a fruit'),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Checkbox(
+                value: _agreed,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _agreed = value ?? false;
+                  });
+                },
+              ),
+              const Text('I agree', style: TextStyle(fontSize: 16)),
+            ],
           ),
+          const SizedBox(height: 16),
           Text(
-            'You chose: ${_selectedFruit ?? 'Nothing'}',
+            _agreed ? 'You agreed!' : 'Please agree',
             style: const TextStyle(fontSize: 20),
           ),
         ],
