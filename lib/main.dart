@@ -41,8 +41,6 @@ class _CheckboxScreenState extends State<CheckboxScreen> {
           children: [
             CheckboxWidget(isChecked: _isChecked, onChanged: _toggleCheckbox),
             const SizedBox(height: 16),
-            CheckboxWidget(isChecked: _isChecked, onChanged: _toggleCheckbox),
-            const SizedBox(height: 16),
             Text(
               _isChecked ? 'Checked!' : 'Unchecked',
               style: const TextStyle(fontSize: 20),
