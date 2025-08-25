@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
-  runApp(const FileStorageApp());
+  runApp(const HttpApp());
 }
 
-class FileStorageApp extends StatelessWidget {
-  const FileStorageApp({super.key});
+class HttpApp extends StatelessWidget {
+  const HttpApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,129 +22,124 @@ class FileStorageApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const FileStorageScreen(),
+      home: const PostsScreen(),
     );
   }
 }
 
-class FileStorageScreen extends StatefulWidget {
-  const FileStorageScreen({super.key});
+class PostsScreen extends StatefulWidget {
+  const PostsScreen({super.key});
 
   @override
-  _FileStorageScreenState createState() => _FileStorageScreenState();
+  _PostsScreenState createState() => _PostsScreenState();
 }
 
-class _FileStorageScreenState extends State<FileStorageScreen> {
-  final TextEditingController _controller = TextEditingController();
-  String _note = ''; // Displayed note
+class _PostsScreenState extends State<PostsScreen> {
+  List<dynamic> _posts = []; // Store fetched posts
+  bool _isLoading = false; // Track loading state
+
+  // Fetch posts from API
+  Future<void> _fetchPosts() async {
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+    try {
+      final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _posts = jsonDecode(response.body); // Parse JSON
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Posts Loaded!')),
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to load posts')),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Check your connection')),
+      );
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _loadNote(); // Load saved note on start
-  }
-
-  // Get file path
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return '${directory.path}/note.txt';
-  }
-
-  // Load note from file
-  Future<void> _loadNote() async {
-    try {
-      final file = File(await _localPath);
-      final contents = await file.readAsString();
-      setState(() {
-        _note = contents;
-      });
-    } catch (e) {
-      setState(() {
-        _note = ''; // Default to empty if file doesn't exist
-      });
-    }
-  }
-
-  // Save note to file
-  Future<void> _saveNote(String note) async {
-    final file = File(await _localPath);
-    await file.writeAsString(note);
-    setState(() {
-      _note = note; // Update UI
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Note Saved!')),
-    );
+    _fetchPosts(); // Load posts on start
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('File Storage UI'),
+        title: const Text('Posts from API'),
         backgroundColor: Colors.orange,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Header
-            Container(
-              margin: const EdgeInsets.all(16.0),
-              alignment: Alignment.center,
-              child: const Text(
-                'Save a Note',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+      body: Column(
+        children: [
+          // Header
+          Container(
+            margin: const EdgeInsets.all(16.0),
+            alignment: Alignment.center,
+            child: const Text(
+              'Latest Posts',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            // Display saved note
-            Container(
-              margin: const EdgeInsets.all(16.0),
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _note.isEmpty ? 'No note saved' : _note,
-                style: const TextStyle(fontSize: 18),
-              ),
+          ),
+          // Refresh button
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: ElevatedButton(
+              onPressed: _fetchPosts,
+              child: const Text('Refresh Posts'),
             ),
-            // Input field
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: TextFormField(
-                controller: _controller,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Your Note',
-                  hintText: 'Enter your note',
-                ),
-                maxLines: 3,
-              ),
-            ),
-            // Save button
-            Container(
-              margin: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_controller.text.isNotEmpty) {
-                    _saveNote(_controller.text);
-                    _controller.clear();
-                  }
-                },
-                child: const Text('Save Note'),
-              ),
-            ),
-          ],
-        ),
+          ),
+          // Posts list
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _posts.isEmpty
+                    ? const Center(child: Text('No posts available', style: TextStyle(fontSize: 18)))
+                    : ListView.builder(
+                        itemCount: _posts.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            padding: const EdgeInsets.all(12.0),
+                            decoration: BoxDecoration(
+                              color: Colors.blue[50],
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.3), blurRadius: 4)],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _posts[index]['title'],
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _posts[index]['body'],
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
