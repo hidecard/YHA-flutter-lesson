@@ -1,9 +1,40 @@
+Flutter Course Outline
+Module 1 – Introduction & Basics
+1.	Introduction to Flutter
+1.	What is Flutter & why use it?
+2.	Flutter vs Native development
+3.	Dart language overview
+2.	Environment Setup
+4.	Installing Flutter SDK
+5.	Setting up Android Studio / VS Code
+6.	Configuring emulators and real devices
+3.	Dart Fundamentals
+7.	Variables, Data Types, Constants
+8.	Functions and Parameters
+9.	Conditional Statements & Loops
+10.	Collections (List, Map, Set)
+4.	First Flutter App
+11.	Understanding main() & runApp()
+12.	MaterialApp & Scaffold basics
+13.	Hot reload & hot restart
+Module 2 – Flutter UI Essentials
+1.	Flutter Widgets Overview
+1.	Stateless vs Stateful widgets
+2.	Widget tree concept
+2.	Basic Widgets
+3.	Text, Image, Icon, Container
+4.	Row, Column, Stack
+3.	Layouts & Positioning
+5.	Padding, Margin, Alignment
+6.	Expanded, Flexible, Spacer
+4.	Buttons & User Interaction
+7.	ElevatedButton, IconButton, GestureDetector
 5.	Input & Forms
 8.	TextField, TextFormField, Dropdown, Checkbox
 9.	Form validation
 
 Module 3 – Navigation & State Management (Beginner)
-1.	Navigation Basics
+1.	Navigation Basics	
 1.	Navigator.push / Navigator.pop
 2.	Named routes
 2.	Passing Data Between Screens
@@ -11,4 +42,55 @@ Module 3 – Navigation & State Management (Beginner)
 3.	setState usage
 4.	Lifting state up
 4.	Bottom Navigation & Drawer Menu
+
+Module 4 – Working with Data & APIs
+1.	Local Data Storage
+1.	SharedPreferences
+2.	File storage basics
+2.	Networking
+3.	HTTP requests with http package
+4.	JSON parsing
+3.	ListView & GridView
+5.	Displaying dynamic data
+4.	FutureBuilder & StreamBuilder
+
+Module 5 – State Management (Intermediate)
+1.	Provider
+1.	ChangeNotifier basics
+2.	Listening to changes
+2.	Riverpod / Bloc (optional)
+3.	Bloc pattern basics
+4.	Event & State flow
+
+Module 6 – Advanced Flutter UI
+1.	Custom Widgets
+1.	Creating reusable components
+2.	Animations
+2.	Implicit animations (AnimatedContainer, AnimatedOpacity)
+3.	Explicit animations (AnimationController)
+3.	Responsive Design
+4.	MediaQuery & LayoutBuilder
+5.	Adaptive UIs for mobile, tablet, web
+4.	Themes & Dark Mode
+
+Module 7 – Firebase Integration
+1.	Firebase Setup
+1.	Project configuration
+2.	Firebase Authentication
+2.	Email/password login
+3.	Google sign-in
+3.	Firebase Firestore Database
+4.	CRUD operations
+4.	Firebase Storage
+5.	Uploading and retrieving images
+5.	Push Notifications with FCM
+
+Module 8 – Advanced Features
+1.	Offline Storage (Hive / SQLite)
+2.	Background Services
+3.	App Lifecycle & Permissions
+4.	Platform Channels (Native Android/iOS integration)
+5.	Integration with APIs (REST, GraphQL)
+
+Module 9 – Final Project
 

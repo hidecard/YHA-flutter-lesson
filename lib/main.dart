@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 void main() {
-  runApp(const DrawerApp());
+  runApp(const FileStorageApp());
 }
 
-class DrawerApp extends StatelessWidget {
-  const DrawerApp({super.key});
+class FileStorageApp extends StatelessWidget {
+  const FileStorageApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,85 +22,82 @@ class DrawerApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const DrawerScreen(),
+      home: const FileStorageScreen(),
     );
   }
 }
 
-class DrawerScreen extends StatelessWidget {
-  const DrawerScreen({super.key});
+class FileStorageScreen extends StatefulWidget {
+  const FileStorageScreen({super.key});
+
+  @override
+  _FileStorageScreenState createState() => _FileStorageScreenState();
+}
+
+class _FileStorageScreenState extends State<FileStorageScreen> {
+  final TextEditingController _controller = TextEditingController();
+  String _note = ''; // Displayed note
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNote(); // Load saved note on start
+  }
+
+  // Get file path
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/note.txt';
+  }
+
+  // Load note from file
+  Future<void> _loadNote() async {
+    try {
+      final file = File(await _localPath);
+      final contents = await file.readAsString();
+      setState(() {
+        _note = contents;
+      });
+    } catch (e) {
+      setState(() {
+        _note = ''; // Default to empty if file doesn't exist
+      });
+    }
+  }
+
+  // Save note to file
+  Future<void> _saveNote(String note) async {
+    final file = File(await _localPath);
+    await file.writeAsString(note);
+    setState(() {
+      _note = note; // Update UI
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Note Saved!')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('YHA Lesson'),
+        title: const Text('File Storage UI'),
         backgroundColor: Colors.orange,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.orange),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'App Menu',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      'Version 1.0',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home, color: Colors.orange),
-              title: const Text('Home', style: TextStyle(fontSize: 16)),
-              onTap: () {}, // Placeholder
-            ),
-            ListTile(
-              leading: const Icon(Icons.person, color: Colors.orange),
-              title: const Text('Profile', style: TextStyle(fontSize: 16)),
-              onTap: () {}, // Placeholder
-            ),
-            ListTile(
-              leading: const Icon(Icons.info, color: Colors.orange),
-              title: const Text('About', style: TextStyle(fontSize: 16)),
-              onTap: () {}, // Placeholder
-            ),
-          ],
-        ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Header
             Container(
               margin: const EdgeInsets.all(16.0),
               alignment: Alignment.center,
               child: const Text(
-                'Drawer Menu Demo',
+                'Save a Note',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
+            // Display saved note
             Container(
               margin: const EdgeInsets.all(16.0),
               padding: const EdgeInsets.all(12.0),
@@ -106,18 +105,46 @@ class DrawerScreen extends StatelessWidget {
                 color: Colors.blue[50],
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'Tap the menu icon to explore!',
-                style: TextStyle(fontSize: 18),
+              child: Text(
+                _note.isEmpty ? 'No note saved' : _note,
+                style: const TextStyle(fontSize: 18),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {}, // Placeholder
-              child: const Text('Get Started'),
+            // Input field
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: TextFormField(
+                controller: _controller,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Your Note',
+                  hintText: 'Enter your note',
+                ),
+                maxLines: 3,
+              ),
+            ),
+            // Save button
+            Container(
+              margin: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_controller.text.isNotEmpty) {
+                    _saveNote(_controller.text);
+                    _controller.clear();
+                  }
+                },
+                child: const Text('Save Note'),
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
