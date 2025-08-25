@@ -3,143 +3,96 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
-  runApp(const HttpApp());
+  runApp(const SimpleJsonApp());
 }
 
-class HttpApp extends StatelessWidget {
-  const HttpApp({super.key});
+class SimpleJsonApp extends StatelessWidget {
+  const SimpleJsonApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.light().copyWith(
-        primaryColor: Colors.orange,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.orange,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        ),
-      ),
-      home: const PostsScreen(),
+      theme: ThemeData(primaryColor: Colors.blue),
+      home: const NewPostScreen(),
     );
   }
 }
 
-class PostsScreen extends StatefulWidget {
-  const PostsScreen({super.key});
+class NewPostScreen extends StatefulWidget {
+  const NewPostScreen({super.key});
 
   @override
-  _PostsScreenState createState() => _PostsScreenState();
+  _NewPostScreenState createState() => _NewPostScreenState();
 }
 
-class _PostsScreenState extends State<PostsScreen> {
-  List<dynamic> _posts = []; // Store fetched posts
-  bool _isLoading = false; // Track loading state
+class _NewPostScreenState extends State<NewPostScreen> {
+  final TextEditingController _controller = TextEditingController();
+  String _postTitle = ''; // Store parsed title
 
-  // Fetch posts from API
-  Future<void> _fetchPosts() async {
-    setState(() {
-      _isLoading = true; // Show loading indicator
-    });
-    try {
-      final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
-      if (response.statusCode == 200) {
-        setState(() {
-          _posts = jsonDecode(response.body); // Parse JSON
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Posts Loaded!')),
-        );
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to load posts')),
-        );
-      }
-    } catch (e) {
+  // Send POST request and parse response
+  Future<void> _createPost() async {
+    final response = await http.post(
+      Uri.parse('https://jsonplaceholder.typicode.com/posts'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'title': _controller.text,
+        'body': 'Sample body',
+        'userId': 1,
+      }),
+    );
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body); // Parse JSON
       setState(() {
-        _isLoading = false;
+        _postTitle = data['title']; // Get title
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: Check your connection')),
-      );
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchPosts(); // Load posts on start
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Posts from API'),
-        backgroundColor: Colors.orange,
-      ),
+      appBar: AppBar(title: const Text('New Post')),
       body: Column(
         children: [
-          // Header
-          Container(
-            margin: const EdgeInsets.all(16.0),
-            alignment: Alignment.center,
-            child: const Text(
-              'Latest Posts',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          // Input
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Post Title',
+              ),
             ),
           ),
-          // Refresh button
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          // Button
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: _fetchPosts,
-              child: const Text('Refresh Posts'),
+              onPressed: () {
+                if (_controller.text.isNotEmpty) {
+                  _createPost();
+                }
+              },
+              child: const Text('Send Post'),
             ),
           ),
-          // Posts list
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _posts.isEmpty
-                    ? const Center(child: Text('No posts available', style: TextStyle(fontSize: 18)))
-                    : ListView.builder(
-                        itemCount: _posts.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                            padding: const EdgeInsets.all(12.0),
-                            decoration: BoxDecoration(
-                              color: Colors.blue[50],
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.3), blurRadius: 4)],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _posts[index]['title'],
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  _posts[index]['body'],
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+          // Display
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              _postTitle.isEmpty ? 'No post yet' : 'Posted: $_postTitle',
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
