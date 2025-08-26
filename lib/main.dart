@@ -9,17 +9,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text('ListView.builder Example')),
-        body: ListView.builder(
-          itemCount: 100,
+        appBar: AppBar(title: Text('ListView.separated Example')),
+        body: ListView.separated(
+          itemCount: 10,
           itemBuilder: (context, index) {
             return ListTile(
               title: Text('Item $index'),
-              leading: Icon(Icons.list),
-              onTap: () {
-                print('Tapped on Item $index');
-              },
+              leading: Icon(Icons.check_circle),
             );
+          },
+          separatorBuilder: (context, index) {
+            return Divider(color: Colors.grey);
           },
         ),
       ),
