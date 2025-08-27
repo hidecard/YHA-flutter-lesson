@@ -57,10 +57,6 @@ Module 4 – Working with Data & APIs
 Module 5 – State Management (Intermediate)
 1.	Provider
 1.	ChangeNotifier basics
-2.	Listening to changes
-2.	Riverpod / Bloc (optional)
-3.	Bloc pattern basics
-4.	Event & State flow
 
 Module 6 – Advanced Flutter UI
 1.	Custom Widgets
