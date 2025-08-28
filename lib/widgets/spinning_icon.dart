@@ -18,7 +18,7 @@ class _SpinningIconState extends State<SpinningIcon> with SingleTickerProviderSt
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
     );
   }
 
@@ -30,6 +30,7 @@ class _SpinningIconState extends State<SpinningIcon> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = MediaQuery.of(context).size.width < 600 ? 24.0 : 32.0;
     return GestureDetector(
       onTap: () => _controller.isCompleted ? _controller.reverse() : _controller.forward(),
       child: AnimatedBuilder(
@@ -37,7 +38,7 @@ class _SpinningIconState extends State<SpinningIcon> with SingleTickerProviderSt
         builder: (context, child) {
           return Transform.rotate(
             angle: _controller.value * 2 * pi,
-            child: Icon(widget.icon, size: 30, color: Theme.of(context).primaryColor),
+            child: Icon(widget.icon, size: iconSize, color: Theme.of(context).primaryColor),
           );
         },
       ),

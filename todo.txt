@@ -79,7 +79,6 @@ Module 7 – Firebase Integration
 4.	CRUD operations
 4.	Firebase Storage
 5.	Uploading and retrieving images
-5.	Push Notifications with FCM
 
 Module 8 – Advanced Features
 1.	Offline Storage (Hive / SQLite)
