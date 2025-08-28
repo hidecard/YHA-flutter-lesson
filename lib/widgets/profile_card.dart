@@ -3,50 +3,29 @@ import 'package:flutter/material.dart';
 class ProfileCard extends StatelessWidget {
   final String name;
   final String email;
-  final String imageUrl;
 
   const ProfileCard({
     super.key,
     required this.name,
     required this.email,
-    required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
+      width: MediaQuery.of(context).size.width * 0.8,
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: const [
-          BoxShadow(blurRadius: 8, color: Colors.black12),
-        ],
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(8),
       ),
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            // Use Image.network for better configuration
-            backgroundImage: NetworkImage(imageUrl),
-            radius: 30,
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                email,
-                style: const TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
+          Text(name, style: theme.textTheme.titleMedium),
+          Text(email, style: theme.textTheme.bodySmall),
         ],
       ),
     );

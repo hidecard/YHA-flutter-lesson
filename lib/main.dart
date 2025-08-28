@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart'; // Import the homepage
-
+import 'home_page.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -11,11 +10,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Custom Widgets Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const HomePage(), // Set HomePage as the starting screen
+      title: 'YHA Lesson',
+      theme: ThemeData(primarySwatch: Colors.orange, useMaterial3: true),
+      home: const HomePage(),
     );
   }
 }
