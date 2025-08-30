@@ -6,7 +6,7 @@ import '../models/user_model.dart';
 import 'user_form_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Users'),
-        actions: [
+        actions: [  
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.push(

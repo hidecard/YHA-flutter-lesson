@@ -32,7 +32,7 @@ class DatabaseService {
       }
       return users;
     });
-  }
+  } 
 
   // Delete user
   Future<void> deleteUser(String id) async {

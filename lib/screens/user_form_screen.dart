@@ -12,7 +12,7 @@ import 'dart:typed_data';
 class UserFormScreen extends StatefulWidget {
   final UserModel? user;
 
-  const UserFormScreen({Key? key, this.user}) : super(key: key);
+  const UserFormScreen({super.key, this.user});
 
   @override
   _UserFormScreenState createState() => _UserFormScreenState();
