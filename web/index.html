@@ -20,7 +20,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js"></script>
   <script>
-    // Firebase configuration
     var firebaseConfig = {
       apiKey: "AIzaSyA4P2B6fZ3nB7tY0X1pX8Qz1W2X3Y4Z5A6",
       authDomain: "mchat-8d6ef.firebaseapp.com",
@@ -31,7 +30,11 @@
       appId: "1:624124730943:web:0a8738bb556f085fcc228a"
     };
 
-    
+    if (typeof firebase !== 'undefined') {
+      firebase.initializeApp(firebaseConfig);
+    } else {
+      console.error('Firebase is not loaded');
+    }
   </script>
 </head>
 <body>

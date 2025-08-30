@@ -23,16 +23,29 @@ class DatabaseService {
     return _db.onValue.map((event) {
       final List<UserModel> users = [];
       final data = event.snapshot.value;
+      print('Raw snapshot value: $data'); // Debug raw data
       if (data != null) {
-        // Convert LinkedMap to Map<String, dynamic>
         final mappedData = _convertToMap(data);
+        print('Mapped data type: ${mappedData.runtimeType}'); // Debug type
+        print('Mapped data: $mappedData'); // Debug converted data
         mappedData.forEach((key, value) {
-          users.add(UserModel.fromMap(key, value));
+          if (key is String && value is Map) {
+            try {
+              final typedValue = Map<String, dynamic>.from(value); // Explicit conversion
+              users.add(UserModel.fromMap(key, typedValue));
+            } catch (e) {
+              print('Error converting value for key $key: $e'); // Debug conversion errors
+            }
+          } else {
+            print('Skipping invalid key-value pair: key=$key, value=$value'); // Debug skipped data
+          }
         });
+      } else {
+        print('No data received from snapshot');
       }
       return users;
     });
-  } 
+  }
 
   // Delete user
   Future<void> deleteUser(String id) async {
@@ -42,8 +55,12 @@ class DatabaseService {
   // Helper method to convert LinkedMap to Map<String, dynamic>
   Map<String, dynamic> _convertToMap(dynamic data) {
     if (data is Map) {
-      return data.map((key, value) => MapEntry(key.toString(), value));
+      return Map<String, dynamic>.fromIterable(
+        data.entries,
+        key: (entry) => entry.key.toString(), // Ensure string keys
+        value: (entry) => entry.value is Map ? _convertToMap(entry.value) : entry.value,
+      );
     }
-    return {};
+    return <String, dynamic>{}; // Return empty map with correct type
   }
 }

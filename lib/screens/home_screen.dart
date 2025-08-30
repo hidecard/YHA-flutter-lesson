@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Users'),
-        actions: [  
+        actions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.push(
@@ -32,9 +32,11 @@ class HomeScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
+            print('Stream error: ${snapshot.error}'); // Debug log
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            print('No data or empty list: ${snapshot.data}'); // Debug log
             return const Center(child: Text('No users found'));
           }
           return ListView.builder(
