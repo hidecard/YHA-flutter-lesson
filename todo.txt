@@ -74,8 +74,6 @@ Module 7 – Firebase Integration
 1.	Project configuration
 2.	Firebase Authentication
 2.	Email/password login
-3.	Google sign-in
-3.	Firebase Firestore Database
 4.	CRUD operations
 4.	Firebase Storage
 5.	Uploading and retrieving images
