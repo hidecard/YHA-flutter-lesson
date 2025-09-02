@@ -10,9 +10,19 @@ class _LoginPageState extends State<LoginPage> {
   final _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String errorMessage = '';
+  final _formKey = GlobalKey<FormState>();
 
-  void login() async {
+  String errorMessage = '';
+  bool isLoading = false;
+
+  Future<void> login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
     try {
       final user = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -24,14 +34,29 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (context) => HomePage(user: user.user!)),
         );
       }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? 'An error occurred';
+      });
     } catch (e) {
       setState(() {
         errorMessage = e.toString();
       });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-  void register() async {
+  Future<void> register() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
     try {
       final user = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -43,11 +68,26 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (context) => HomePage(user: user.user!)),
         );
       }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? 'An error occurred';
+      });
     } catch (e) {
       setState(() {
         errorMessage = e.toString();
       });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -56,28 +96,53 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: Text('Login/Register')),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            Text(errorMessage, style: TextStyle(color: Colors.red)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(onPressed: login, child: Text('Login')),
-                ElevatedButton(onPressed: register, child: Text('Register')),
-              ],
-            ),
-          ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter email';
+                  }
+                  if (!value.contains('@')) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+              if (errorMessage.isNotEmpty)
+                Text(errorMessage, style: TextStyle(color: Colors.red)),
+              SizedBox(height: 20),
+              isLoading
+                  ? CircularProgressIndicator()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(onPressed: login, child: Text('Login')),
+                        ElevatedButton(onPressed: register, child: Text('Register')),
+                      ],
+                    ),
+            ],
+          ),
         ),
       ),
     );
@@ -112,7 +177,20 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Text('Welcome, ${user.email}!'),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Welcome',
+              style: TextStyle(fontSize: 30, color: Colors.red),
+            ),
+            SizedBox(width: 10),
+            Text(
+              '${user.email}',
+              style: TextStyle(fontSize: 30, color: Colors.blue),
+            ),
+          ],
+        ),
       ),
     );
   }
