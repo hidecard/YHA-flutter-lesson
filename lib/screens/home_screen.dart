@@ -1,71 +1,85 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/database_service.dart';
-import '../services/storage_service.dart';
-import '../models/user_model.dart';
-import 'user_form_screen.dart';
+import '../db/database_helper.dart';
+import '../models/task_model.dart';
+import 'add_edit_task_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Task> tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshTasks();
+  }
+
+  void _refreshTasks() async {
+    tasks = await DatabaseHelper.instance.getTasks();
+    setState(() {});
+  }
+
+  void _toggleComplete(Task task) async {
+    task.isCompleted = task.isCompleted == 0 ? 1 : 0;
+    await DatabaseHelper.instance.updateTask(task);
+    _refreshTasks();
+  }
+
+  void _deleteTask(int id) async {
+    await DatabaseHelper.instance.deleteTask(id);
+    _refreshTasks();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final databaseService = Provider.of<DatabaseService>(context);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Users'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const UserFormScreen()),
+      appBar: AppBar(title: Text('Tasks Manager')),
+      body: tasks.isEmpty
+          ? Center(child: Text('No tasks yet'))
+          : ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final task = tasks[index];
+                return ListTile(
+                  title: Text(task.title,
+                      style: TextStyle(
+                          decoration: task.isCompleted == 1
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none)),
+                  subtitle: Text(task.description),
+                  leading: Checkbox(
+                    value: task.isCompleted == 1,
+                    onChanged: (_) => _toggleComplete(task),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => AddEditTaskScreen(task: task)));
+                            _refreshTasks();
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () => _deleteTask(task.id!)),
+                    ],
+                  ),
+                );
+              },
             ),
-          ),
-        ],
-      ),
-      body: StreamBuilder<List<UserModel>>(
-        stream: databaseService.getUsers(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            print('Stream error: ${snapshot.error}'); // Debug log
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            print('No data or empty list: ${snapshot.data}'); // Debug log
-            return const Center(child: Text('No users found'));
-          }
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final user = snapshot.data![index];
-              return ListTile(
-                leading: user.photoUrl != null
-                    ? CircleAvatar(backgroundImage: NetworkImage(user.photoUrl!))
-                    : const CircleAvatar(child: Icon(Icons.person)),
-                title: Text(user.name),
-                subtitle: Text(user.email),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => UserFormScreen(user: user)),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await databaseService.deleteUser(user.id);
-                    if (user.photoUrl != null) {
-                      await Provider.of<StorageService>(context, listen: false)
-                          .deletePhoto(user.id);
-                    }
-                  },
-                ),
-              );
-            },
-          );
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () async {
+          await Navigator.push(
+              context, MaterialPageRoute(builder: (_) => AddEditTaskScreen()));
+          _refreshTasks();
         },
       ),
     );

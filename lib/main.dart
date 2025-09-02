@@ -1,23 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // <- your generated file
-import 'login_page.dart';       // <- we will create this
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
-void main() async {
+import 'screens/home_screen.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Firebase Auth Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: LoginPage(),
-    );
+  if (kIsWeb) {
+    // Web: use IndexedDB-backed database
+    databaseFactory = databaseFactoryFfiWeb;
+  } else {
+    // Mobile/Desktop: use native SQLite
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
   }
+
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: HomeScreen(),
+  ));
 }
